@@ -11,6 +11,14 @@ var particles = [], fields = [], emitters = [];
 
 var maxParticles = 20000;
 var emissionRate = 5;
+var particleStyle = {
+	color:'rgba(0,0,255,0.2)',
+	basicSize:1,
+	massMultiplier:1
+};
+var fieldStyle = {
+	resolution: 10
+}
 
 /*---------- events ----------*/
 
@@ -71,11 +79,11 @@ function queue() {
 }
 
 function draw() {
-	drawParticles({color:'rgba(0,0,255,0.2)',basicSize:1,massMultiplier:1});
+	drawParticles(particleStyle);
 }
 
 function drawOnce() {
-	drawField(3);
+	drawField(fieldStyle);
 	emitters.forEach(drawCircle);
 	fields.forEach(drawCircle);
 }
@@ -135,19 +143,19 @@ function drawParticles (options) {
 	}
 }
 
-function drawField (resolution) {
-	for (var x = -Math.floor(width/resolution/2); x < Math.floor(width/resolution/2); x++) {
-		for (var y = -Math.floor(width/resolution/2); y < Math.floor(height/resolution/2); y++) {
+function drawField (options) {
+	for (var x = -Math.round(width/options.resolution/2); x < Math.round(width/options.resolution/2); x++) {
+		for (var y = -Math.round(width/options.resolution/2); y < Math.round(height/options.resolution/2); y++) {
 			var g = 0;
 			
 			for (var i = 0; i < fields.length; i++) {
 				var field = fields[i];
-				var distance = Math.sqrt(Math.pow(field.position.x - x*resolution,2)+Math.pow(field.position.y - y*resolution,2));
+				var distance = Math.sqrt(Math.pow(field.position.x - x*options.resolution,2)+Math.pow(field.position.y - y*options.resolution,2));
 				g += (field.mass*500000)/(distance*distance);
 			}
 
-			cty.fillStyle = 'rgb('+Math.floor(128-g)+','+Math.floor(128+g)+',0)';
-			cty.fillRect(Math.floor(x*resolution+(width/2)),Math.floor(y*resolution+(height/2)),resolution,resolution);
+			cty.fillStyle = 'rgb('+Math.round(128-g)+','+Math.round(128+g)+',0)';
+			cty.fillRect(Math.round(x*options.resolution+(width/2)),Math.round(y*options.resolution+(height/2)),options.resolution,options.resolution);
 		}
 	}
 }
