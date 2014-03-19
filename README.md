@@ -11,8 +11,8 @@ Just open index.html in a modern browser.
 
 ###Keyboard Commands
 
-| key :|: command                                 |
-|------|------------------------------------------|
+| key  | command                                  |
+|-----:|:-----------------------------------------|
 |    g | Generates a new field.                   |
 |    c | Deletes all the particles.               |
 |    h | Change color to highlight mode.          |
