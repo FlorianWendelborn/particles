@@ -4,10 +4,11 @@
 
 Just some interesting particles moving through gravitational fields.
 
+
 ##Usage
 
 ###Running
-Just open index.html in a modern browser.
+Just open [index.html](http://florianwendelborn.github.io/particles.js/) in a modern browser.
 
 ###Keyboard Commands
 
