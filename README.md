@@ -6,7 +6,22 @@ Just some interesting particles moving through gravitational fields.
 
 ##Usage
 
+###Running
 Just open index.html in a modern browser.
+
+###Keyboard Commands
+
+| key :|: command                                 |
+|------|------------------------------------------|
+|    g | Generates a new field.                   |
+|    c | Deletes all the particles.               |
+|    h | Change color to highlight mode.          |
+|    n | Change color back to normal.             |
+|    + | Increase emissionRate.                   |
+|    - | Lower emissionRate.                      |
+|    m | Toggle massMultiplier between 0 and 1.   |
+|    b | Toggle basicSize between 1 and 5 pixels. |
+
 
 ##License
 

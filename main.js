@@ -30,18 +30,26 @@ window.onload = function () {
 
 	updateResolution(false);
 
-	for (var i = 0; i < Math.random()*2+1; i++) {
-		emitters.push(new Emitter(new Vector(width*Math.random()-width/2,height*Math.random()-height/2),new Vector.fromAngle(Math.PI,Math.random()*10),Math.PI*2,Math.random()*20+5));
-	}
-	for (var i = 0; i < Math.random()*10+5; i++) {
-		fields.push(new Field(new Vector(width*Math.random()-width/2,height*Math.random()-height/2),Math.random()*20-10,Math.random()<0.1));
-	}
-	
-	drawOnce();
+	generate();
+
 	loop();
 }
 
 window.onresize = updateResolution;
+
+window.onkeydown = function (e) {
+	switch (e.keyCode) {
+		case 71:generate();break;//g
+		case 67:particles=[];break;//c
+		case 72:particleStyle.color='highlight';break;//h
+		case 78:particleStyle.color='rgba(0,0,255,0.2)';break;//n
+		case 107:emissionRate++;break;//+
+		case 109:emissionRate--;break;//-
+		case 77:particleStyle.massMultiplier=particleStyle.massMultiplier?0:1;break;//m
+		case 66:particleStyle.basicSize=particleStyle.basicSize==1?5:1;break;//b
+		default: console.log(e.keyCode);
+	}
+}
 
 function updateResolution (noEvent) {
 	height = window.innerHeight;
@@ -158,4 +166,19 @@ function drawField (options) {
 			cty.fillRect(Math.round(x*options.resolution+(width/2)),Math.round(y*options.resolution+(height/2)),options.resolution,options.resolution);
 		}
 	}
+}
+
+/*---------- generator ----------*/
+
+function generate () {
+	emitters = [];
+	fields = [];
+	for (var i = 0; i < Math.random()*2+1; i++) {
+		emitters.push(new Emitter(new Vector(width*Math.random()-width/2,height*Math.random()-height/2),new Vector.fromAngle(Math.PI,Math.random()*10),Math.PI*2,Math.random()*20+5));
+	}
+	for (var i = 0; i < Math.random()*10+5; i++) {
+		fields.push(new Field(new Vector(width*Math.random()-width/2,height*Math.random()-height/2),Math.random()*20-10,Math.random()<0.1));
+	}
+
+	drawOnce();
 }
