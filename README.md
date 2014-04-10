@@ -26,6 +26,8 @@ Just open [index.html](http://florianwendelborn.github.io/particles.js/) in a mo
 
 ##License
 
+Some parts are based on [this article](http://html5hub.com/build-a-javascript-particle-system/).
+
 The MIT License (MIT)
 
 Copyright (c) 2014 Florian Wendelborn

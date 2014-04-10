@@ -6,6 +6,7 @@
 -add more field types
 -implement speed of light as update speed of gravity (largely slowed of course)
 -draw better gravitational fields
+-draw particle path
 ##Optimization
 -clean up code
 -put objects in another file
