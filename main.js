@@ -15,7 +15,11 @@ var particleStyle = {
 	massMultiplier:1
 };
 var fieldStyle = {
-	resolution: 10
+	mode: 1,
+	power: 1,
+	resolution: 1,
+	mass: 10,
+	color: 'rgba(0,255,0,0.2)'
 }
 
 /*---------- events ----------*/
@@ -150,20 +154,72 @@ function drawParticles (options) {
 }
 
 function drawField (options) {
-	for (var x = -Math.round(width/options.resolution/2); x < Math.round(width/options.resolution/2); x++) {
-		for (var y = -Math.round(width/options.resolution/2); y < Math.round(height/options.resolution/2); y++) {
+	cty.clearRect(0,0,width,height);
+	var data = [];
+
+	// calculate and draw vertical lines
+	
+	cty.beginPath();
+
+	for (var x = 0; x < width/options.resolution; x++) {
+		for (var y = 0; y < height/options.resolution; y++) {
+			if (!x) data[y] = [];
 			var g = 0;
 			
+			var totalAccelerationX = 0
+				  , totalAccelerationY = 0;
+
 			for (var i = 0; i < fields.length; i++) {
 				var field = fields[i];
-				var distance = Math.sqrt(Math.pow(field.position.x - x*options.resolution,2)+Math.pow(field.position.y - y*options.resolution,2));
-				g += (field.mass*500000)/(distance*distance);
+
+				var vectorX = field.position.x - x*options.resolution+width/2;
+				var vectorY = field.position.y - y*options.resolution+height/2;
+
+				if (field.strange && Math.sqrt(vectorX*vectorX+vectorY*vectorY) < options.mass*options.mass) {
+					var force = -(Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+				} else {
+					var force = (Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+				}
+
+				totalAccelerationX += vectorX * force;
+				totalAccelerationY += vectorY * force;
 			}
 
-			cty.fillStyle = 'rgb('+Math.round(128-g)+','+Math.round(128+g)+',0)';
-			cty.fillRect(Math.round(x*options.resolution+(width/2)),Math.round(y*options.resolution+(height/2)),options.resolution,options.resolution);
+			data[y][x] = {
+				x: totalAccelerationX,
+				y: totalAccelerationY
+			};
+			
+			if (options.mode == 0) {
+				if (!y) {
+					cty.moveTo(x*options.resolution-totalAccelerationX, y*options.resolution-totalAccelerationY)
+				} else {
+					cty.lineTo(x*options.resolution-totalAccelerationX, y*options.resolution-totalAccelerationY)
+				}
+			} else if (options.mode == 1) {
+				cty.moveTo(x*options.resolution, y*options.resolution);
+				cty.lineTo(x*options.resolution-data[y][x].x,y*options.resolution-data[y][x].y);		
+			}
+		}
+		
+	}
+
+	// draw horizontal lines
+
+	for (var y = 0; y < data.length; y++) {
+		for (var x = 0; x < data[y].length; x++) {
+			if (options.mode == 0) {
+				if (!x) {
+					cty.moveTo(-data[y][x].x, y*options.resolution);
+				} else {
+					cty.lineTo(x*options.resolution-data[y][x].x, y*options.resolution-data[y][x].y);
+				}
+			}
 		}
 	}
+
+	cty.strokeStyle = options.color;
+	cty.stroke();
 }
 
 /*---------- generator ----------*/
