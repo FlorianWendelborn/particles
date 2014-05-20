@@ -96,14 +96,12 @@ function draw() {
 	drawParticles(particleStyle);
 }
 
-function drawOnce(empty) {
-	if (empty) {
-		cty.clearRect(0,0,width,height);
-	} else {
-		drawField(fieldStyle);
-		emitters.forEach(drawCircle);
-		fields.forEach(drawCircle);
+function drawOnce(onlyDots) {
+	if (!onlyDots) {
+		drawField(fieldStyle);	
 	}
+	emitters.forEach(drawCircle);
+	fields.forEach(drawCircle);
 }
 
 /*---------- particles ----------*/
@@ -316,7 +314,7 @@ function empty () {
 	emitters = [];
 	fields = [];
 	particles = [];
-	drawOnce(true);
+	cty.clearRect(0,0,width,height);
 }
 
 function add (e) {
@@ -329,7 +327,7 @@ function add (e) {
 			var spread = prompt("Spread in degrees? [float]") || 360;
 			var mass = prompt("Maximum particle mass? [float]") || 20;
 			emitters.push(new Emitter(new Vector(x,y), new Vector.fromAngle(Math.PI,velocity), spread/180*Math.PI, mass));
-			drawOnce();
+			drawOnce(true);
 		break;
 		case "f"://field
 			var mass = prompt("Mass? [float]") || 5;
