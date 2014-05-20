@@ -1,30 +1,33 @@
 #particles.js
 
-##Description
+## Description
 
 Just some interesting particles moving through gravitational fields.
 
 
 ##Usage
 
-###Running
+### Running
 Just open [index.html](http://florianwendelborn.github.io/particles.js/) in a modern browser.
 
-###Keyboard Commands
+### Keyboard and Mouse Commands
 
-| key | command                                  |
-|----:|:-----------------------------------------|
-|   g | Generates a new field.                   |
-|   c | Deletes all the particles.               |
-|   h | Change color to highlight mode.          |
-|   n | Change color back to normal.             |
-|   + | Increase emissionRate.                   |
-|   - | Lower emissionRate.                      |
-|   m | Toggle massMultiplier between 0 and 1.   |
-|   b | Toggle basicSize between 1 and 5 pixels. |
+|   key | command                                  |
+|------:|:-----------------------------------------|
+|     g | Generates a new field.                   |
+|     c | Deletes all the particles.               |
+|     h | Change color to highlight mode.          |
+|     n | Change color back to normal.             |
+|     + | Increase emissionRate.                   |
+|     - | Lower emissionRate.                      |
+|     m | Toggle massMultiplier between 0 and 1.   |
+|     s | Toggle basicSize between 1 and 5 pixels. |
+|     f | Turn on fancy resolution. (toggle: fast) |
+|     b | Clears everything.                       |
+| click | Creates something.                       |
 
 
-##License
+## License
 
 Some parts are based on [this article](http://html5hub.com/build-a-javascript-particle-system/).
 

@@ -17,9 +17,9 @@ var particleStyle = {
 var fieldStyle = {
 	mode: 1,
 	power: 1,
-	resolution: 1,
+	resolution: 2,
 	mass: 10,
-	color: 'rgba(0,255,0,0.2)'
+	color: 'rgba(0,255,0,1)'
 }
 
 /*---------- events ----------*/
@@ -48,7 +48,9 @@ window.onkeydown = function (e) {
 		case 107:emissionRate++;break;//+
 		case 109:emissionRate--;break;//-
 		case 77:particleStyle.massMultiplier=particleStyle.massMultiplier?0:1;break;//m
-		case 66:particleStyle.basicSize=particleStyle.basicSize==1?5:1;break;//b
+		case 83:particleStyle.basicSize=particleStyle.basicSize==1?5:1;break;//s
+		case 66:empty();break;//b
+		case 70:fieldStyle.resolution=fieldStyle.resolution==1?2:1;fieldStyle.color=fieldStyle.resolution==1?"rgba(0,255,0,0.2)":"rgba(0,255,0,1)";drawOnce();break;//f
 		default: console.log(e.keyCode);
 	}
 }
@@ -65,6 +67,8 @@ function updateResolution (noEvent) {
 
 	noEvent && drawOnce();
 }
+
+window.onmousedown = add;
 
 /*----------technical functions----------*/
 
@@ -92,10 +96,14 @@ function draw() {
 	drawParticles(particleStyle);
 }
 
-function drawOnce() {
-	drawField(fieldStyle);
-	emitters.forEach(drawCircle);
-	fields.forEach(drawCircle);
+function drawOnce(empty) {
+	if (empty) {
+		cty.clearRect(0,0,width,height);
+	} else {
+		drawField(fieldStyle);
+		emitters.forEach(drawCircle);
+		fields.forEach(drawCircle);
+	}
 }
 
 /*---------- particles ----------*/
@@ -155,67 +163,134 @@ function drawParticles (options) {
 
 function drawField (options) {
 	cty.clearRect(0,0,width,height);
-	var data = [];
-
-	// calculate and draw vertical lines
 	
 	cty.beginPath();
 
-	for (var x = 0; x < width/options.resolution; x++) {
-		for (var y = 0; y < height/options.resolution; y++) {
-			if (!x) data[y] = [];
-			var g = 0;
+	switch (options.mode) {
+		case 0:
+			var data = [];
 			
-			var totalAccelerationX = 0
-				  , totalAccelerationY = 0;
+			// calculate and draw vertical lines
+			for (var x = 0; x < width/options.resolution; x++) {
+				for (var y = 0; y < height/options.resolution; y++) {
+					if (!x) data[y] = [];
+					
+					var totalAccelerationX = 0
+					  , totalAccelerationY = 0;
 
-			for (var i = 0; i < fields.length; i++) {
-				var field = fields[i];
+					for (var i = 0; i < fields.length; i++) {
+						var field = fields[i];
 
-				var vectorX = field.position.x - x*options.resolution+width/2;
-				var vectorY = field.position.y - y*options.resolution+height/2;
+						var vectorX = field.position.x - x*options.resolution+width/2;
+						var vectorY = field.position.y - y*options.resolution+height/2;
 
-				if (field.strange && Math.sqrt(vectorX*vectorX+vectorY*vectorY) < options.mass*options.mass) {
-					var force = -(Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
-				} else {
-					var force = (Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
-				}
+						if (field.strange && Math.sqrt(vectorX*vectorX+vectorY*vectorY) < options.mass*options.mass) {
+							var force = -(Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+						} else {
+							var force = (Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+						}
 
-				totalAccelerationX += vectorX * force;
-				totalAccelerationY += vectorY * force;
-			}
+						totalAccelerationX += vectorX * force;
+						totalAccelerationY += vectorY * force;
+					}
 
-			data[y][x] = {
-				x: totalAccelerationX,
-				y: totalAccelerationY
-			};
-			
-			if (options.mode == 0) {
-				if (!y) {
-					cty.moveTo(x*options.resolution-totalAccelerationX, y*options.resolution-totalAccelerationY)
-				} else {
-					cty.lineTo(x*options.resolution-totalAccelerationX, y*options.resolution-totalAccelerationY)
-				}
-			} else if (options.mode == 1) {
-				cty.moveTo(x*options.resolution, y*options.resolution);
-				cty.lineTo(x*options.resolution-data[y][x].x,y*options.resolution-data[y][x].y);		
-			}
-		}
-		
-	}
-
-	// draw horizontal lines
-
-	for (var y = 0; y < data.length; y++) {
-		for (var x = 0; x < data[y].length; x++) {
-			if (options.mode == 0) {
-				if (!x) {
-					cty.moveTo(-data[y][x].x, y*options.resolution);
-				} else {
-					cty.lineTo(x*options.resolution-data[y][x].x, y*options.resolution-data[y][x].y);
+					data[y][x] = {
+						x: totalAccelerationX,
+						y: totalAccelerationY
+					};
+					
+					if (!y) {
+						cty.moveTo(x*options.resolution-totalAccelerationX, y*options.resolution-totalAccelerationY)
+					} else {
+						cty.lineTo(x*options.resolution-totalAccelerationX, y*options.resolution-totalAccelerationY)
+					}
 				}
 			}
-		}
+
+			// draw horizontal lines
+			for (var y = 0; y < data.length; y++) {
+				for (var x = 0; x < data[y].length; x++) {
+					if (!x) {
+						cty.moveTo(-data[y][x].x, y*options.resolution);
+					} else {
+						cty.lineTo(x*options.resolution-data[y][x].x, y*options.resolution-data[y][x].y);
+					}
+				}
+			}
+		break;
+		case 1:
+			var data = [];
+
+			// calculate vertices
+			for (var x = 0; x < width/options.resolution; x++) {
+				for (var y = 0; y < height/options.resolution; y++) {
+					if (!x) data[y] = [];
+					
+					var totalAccelerationX = 0
+					  , totalAccelerationY = 0;
+
+					for (var i = 0; i < fields.length; i++) {
+						var field = fields[i];
+
+						var vectorX = field.position.x - x*options.resolution+width/2;
+						var vectorY = field.position.y - y*options.resolution+height/2;
+
+						if (field.strange && Math.sqrt(vectorX*vectorX+vectorY*vectorY) < options.mass*options.mass) {
+							var force = -(Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+						} else {
+							var force = (Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+						}
+
+						totalAccelerationX += vectorX * force;
+						totalAccelerationY += vectorY * force;
+					}
+
+					data[y][x] = {
+						x: totalAccelerationX,
+						y: totalAccelerationY
+					};
+					
+					cty.moveTo(x*options.resolution, y*options.resolution);
+					cty.lineTo(x*options.resolution-data[y][x].x,y*options.resolution-data[y][x].y);
+				}
+			}
+		break;
+		case 2:
+			for (var ij = 0; ij < fields.length; ij++) {
+				var x = fields[ij].position.x+5;
+				var y = fields[ij].position.y+5;
+				cty.moveTo(x, y);
+				for (var j = 0; j < 200000; j++) {
+					var totalAccelerationX = 0
+					  , totalAccelerationY = 0;
+
+					var g = 0;
+
+					for (var i = 0; i < fields.length; i++) {
+						var field = fields[i];
+
+						var vectorX = field.position.x - x;
+						var vectorY = field.position.y - y;
+
+						if (field.strange && Math.sqrt(vectorX*vectorX+vectorY*vectorY) < options.mass*options.mass) {
+							var force = -(Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+						} else {
+							var force = (Math.pow(field.mass,options.power)*options.mass) / (vectorX*vectorX+vectorY*vectorY);
+						}
+
+						totalAccelerationX += vectorX * force;
+						totalAccelerationY += vectorY * force;
+					}
+
+					cty.lineTo(x, y);
+
+					x += totalAccelerationX;
+					y += totalAccelerationY;
+				}
+			}
+		break;
+		default:
+			console.error("drawField: unknown mode " + options.mode);
 	}
 
 	cty.strokeStyle = options.color;
@@ -235,4 +310,40 @@ function generate () {
 	}
 
 	drawOnce();
+}
+
+function empty () {
+	emitters = [];
+	fields = [];
+	particles = [];
+	drawOnce(true);
+}
+
+function add (e) {
+	var x = e.x-width/2;
+	var y = e.y-height/2;
+	var type = prompt("[f]ield, [e]mitter, or [p]articles?");
+	switch (type) {
+		case "e"://emitter
+			var velocity = prompt("Velocity? [float]") || 5;
+			var spread = prompt("Spread in degrees? [float]") || 360;
+			var mass = prompt("Maximum particle mass? [float]") || 20;
+			emitters.push(new Emitter(new Vector(x,y), new Vector.fromAngle(Math.PI,velocity), spread/180*Math.PI, mass));
+			drawOnce();
+		break;
+		case "f"://field
+			var mass = prompt("Mass? [float]") || 5;
+			var strange = prompt("Strange? [boolean]")=="true" || false;
+			fields.push(new Field(new Vector(x,y), mass, strange));
+			drawOnce();
+		break;
+		case "p"://particle
+			var amount = prompt("Amount? [integer]") || 50;
+			var velocity = prompt("Velocity? [float]") || 0;
+			var mass = prompt("Mass? [float]") || 5;
+			for (var i = 0; i < amount; i++) {
+				particles.push(new Particle(new Vector(x,y), new Vector.fromAngle(2*Math.PI*Math.random(), velocity), mass));
+			}
+		break;
+	}
 }
